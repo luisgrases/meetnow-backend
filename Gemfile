@@ -25,6 +25,11 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 
 gem 'devise'
 
+gem 'devise_token_auth'
+
+gem 'omniauth', '~> 1.2', '>= 1.2.2'
+gem 'rack-cors', :require => 'rack/cors'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
