@@ -11,13 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151221032010) do
+ActiveRecord::Schema.define(version: 20151221033119) do
 
   create_table "events", force: :cascade do |t|
     t.string  "title"
     t.string  "description"
     t.integer "assist_limit"
   end
+
+  create_table "members", force: :cascade do |t|
+    t.integer "event_id"
+    t.integer "user_id"
+    t.string  "status"
+  end
+
+  add_index "members", ["event_id"], name: "index_members_on_event_id"
+  add_index "members", ["user_id"], name: "index_members_on_user_id"
 
   create_table "users", force: :cascade do |t|
     t.string   "provider",               default: "email", null: false
