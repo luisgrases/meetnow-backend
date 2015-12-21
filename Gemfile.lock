@@ -171,6 +171,7 @@ DEPENDENCIES
   omniauth (~> 1.2, >= 1.2.2)
   rack-cors
   rails (= 4.2.5)
+  responders
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   spring

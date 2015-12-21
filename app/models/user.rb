@@ -1,4 +1,7 @@
 class User < ActiveRecord::Base
+  has_many :members
+  has_many :events, through: :members
+
  before_save -> { skip_confirmation! }
   # Include default devise modules.
   devise :database_authenticatable, :registerable,
