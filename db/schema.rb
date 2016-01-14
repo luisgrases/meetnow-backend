@@ -20,6 +20,9 @@ ActiveRecord::Schema.define(version: 20160114205400) do
   end
 
   create_table "friendships", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "friend_id"
+    t.boolean "accepted"
   end
 
   create_table "members", force: :cascade do |t|
