@@ -10,7 +10,7 @@ module Api
       def create
         user = User.find(current_user.id)
         event = Event.create(event_params)
-        member = Member.create(user: user, event: event)
+        member = Member.create(user: user, event: event, privilege: 'admin')
         respond_with :api, event
       end
 
