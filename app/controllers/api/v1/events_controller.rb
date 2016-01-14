@@ -7,6 +7,18 @@ module Api
         respond_with user.events
       end
 
+      def create
+        user = User.find(current_user.id)
+        event = Event.create(event_params)
+        member = Member.create(user: user, event: event)
+        respond_with :api, event
+      end
+
+      private
+
+      def event_params
+        params.require(:event).permit(:title, :description, :assist_limit)
+      end
     end
   end
 end
