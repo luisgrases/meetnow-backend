@@ -4,10 +4,27 @@ module Api
       respond_to :json
       def index
         user = User.find(current_user.id)
-        respond_with user.friends
+        #friends -> i have added
+        #inverse_friends -> added_me
+
+        all_friends = user.friends + user.inverse_friends
+
+        respond_with all_friends
       end
 
-      def create
+      def accepted
+        user = User.find(current_user.id)
+        respond_with user.accepted_friends
+      end
+
+      def requests_sent
+        user = User.find(current_user.id)
+        respond_with user.friend_requests_sent
+      end
+
+      def requests_recieved
+        user = User.find(current_user.id)
+        respond_with user.friend_requests_recieved
       end
 
       private
