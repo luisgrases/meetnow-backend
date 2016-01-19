@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160114205400) do
+ActiveRecord::Schema.define(version: 20160119015108) do
 
   create_table "events", force: :cascade do |t|
     t.string  "title"
@@ -22,7 +22,7 @@ ActiveRecord::Schema.define(version: 20160114205400) do
   create_table "friendships", force: :cascade do |t|
     t.integer "user_id"
     t.integer "friend_id"
-    t.boolean "accepted"
+    t.boolean "accepted",  default: false
   end
 
   create_table "members", force: :cascade do |t|

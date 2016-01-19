@@ -12,6 +12,13 @@ module Api
         respond_with all_friends
       end
 
+      def create
+        user = User.find(current_user.id)
+        friend = User.find(friendship_params[:id])
+        user.friends << friend
+        respond_with :api, user
+      end
+
       def accepted
         user = User.find(current_user.id)
         respond_with user.accepted_friends
@@ -30,7 +37,7 @@ module Api
       private
 
       def friendship_params
-        params.require(:friendship).permit(:friend_id, :user_id, :accepted)
+        params.require(:friendship).permit(:id, :accepted)
       end
     end
   end
