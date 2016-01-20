@@ -9,6 +9,7 @@ Rails.application.routes.draw  do
           get 'accepted'
           get 'requests_sent'
           get 'requests_recieved'
+          post 'accept'
         end
       end
       resources :users do

@@ -21,6 +21,7 @@ class User < ActiveRecord::Base
     return result
   end
 
+
   def friend_requests_sent
     result = []
     pending_friendships = Friendship.where(user: self, accepted: false)
