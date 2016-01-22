@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
   end
 
 
-
+accepts_nested_attributes_for :members, :events
   # Include default devise modules.
   devise :database_authenticatable, :registerable,
           :recoverable, :rememberable, :trackable, :validatable,

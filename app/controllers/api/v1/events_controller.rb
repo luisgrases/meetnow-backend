@@ -11,6 +11,9 @@ module Api
         user = User.find(current_user.id)
         event = Event.create(event_params)
         member = Member.create(user: user, event: event, privilege: 'admin')
+        params[:users].each do |invited|
+          event.users << User.find(invited["id"]);
+        end
         respond_with :api, event
       end
 
@@ -19,6 +22,7 @@ module Api
       def event_params
         params.require(:event).permit(:title, :description, :assist_limit)
       end
+
     end
   end
 end
