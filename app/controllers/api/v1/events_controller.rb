@@ -10,7 +10,7 @@ module Api
       def create
         user = User.find(current_user.id)
         event = Event.create(event_params)
-        member = Member.create(user: user, event: event, privilege: 'admin')
+        member = Member.create(user: user, event: event, privilege: 'admin', status: 'assisting')
         params[:users].each do |invited|
           event.users << User.find(invited["id"]);
         end
