@@ -5,5 +5,8 @@ class Event < ActiveRecord::Base
 
   accepts_nested_attributes_for :users, :members
 
+  def attending_friends
+    User.includes(:members).where(members: {event_id: 51})
+  end
 
 end
