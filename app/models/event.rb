@@ -9,4 +9,11 @@ class Event < ActiveRecord::Base
     User.includes(:members).where(members: {event: self, status: 'pending'})
   end
 
+  def assisting_people
+    User.includes(:members).where(members: {event: self, status: 'assisting'})
+  end
+
+  def not_assisting_people
+    User.includes(:members).where(members: {event: self, status: 'not_assisting'})
+  end
 end
