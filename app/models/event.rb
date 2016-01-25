@@ -5,7 +5,7 @@ class Event < ActiveRecord::Base
 
   accepts_nested_attributes_for :users, :members
 
-  def attending_friends
+  def attending_people
     User.includes(:members).where(members: {event: self, status: 'pending'})
   end
 
