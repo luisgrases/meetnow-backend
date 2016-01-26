@@ -1,3 +1,5 @@
+require 'json'
+
 class Event < ActiveRecord::Base
 
   has_many :members
@@ -6,15 +8,36 @@ class Event < ActiveRecord::Base
   accepts_nested_attributes_for :users, :members
 
   def assisting_people
-    User.includes(:members).where(members: {event: self, status: 'assisting'})
+    result = []
+    User.includes(:members).where(members: {event: self, status: 'assisting'}).each do |user|
+      member_privilege = Member.where(event: self, user: user).first.privilege
+      json = user.as_json
+      json["privilege"] = member_privilege
+      result << json
+    end
+    result
   end
 
   def not_assisting_people
-    User.includes(:members).where(members: {event: self, status: 'not_assisting'})
+    result = []
+    User.includes(:members).where(members: {event: self, status: 'not_assisting'}).each do |user|
+      member_privilege = Member.where(event: self, user: user).first.privilege
+      json = user.as_json
+      json["privilege"] = member_privilege
+      result << json
+    end
+    result
   end
 
   def pending_people
-    User.includes(:members).where(members: {event: self, status: 'pending'})
+    result = []
+    User.includes(:members).where(members: {event: self, status: 'pending'}).each do |user|
+      member_privilege = Member.where(event: self, user: user).first.privilege
+      json = user.as_json
+      json["privilege"] = member_privilege
+      result << json
+    end
+    result
   end
 
   def invited_contacts_counter

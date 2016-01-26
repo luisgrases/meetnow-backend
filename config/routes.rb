@@ -7,7 +7,7 @@ Rails.application.routes.draw  do
         member do
           get 'invited_contacts_counter'
           get 'assisting_people'
-          get 'not assisting_people'
+          get 'not_assisting_people'
           get 'pending_people'
         end
       end
