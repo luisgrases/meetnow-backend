@@ -22,6 +22,21 @@ module Api
         respond_with event.invited_contacts_counter
       end
 
+      def assisting_people
+        event = Event.find(params[:id])
+        respond_with event.assisting_people
+      end
+
+      def not_assisting_people
+        event = Event.find(params[:id])
+        respond_with event.not_assisting_people
+      end
+
+      def pending_people
+        event = Event.find(params[:id])
+        respond_with event.pending_people
+      end
+
 
       private
 
