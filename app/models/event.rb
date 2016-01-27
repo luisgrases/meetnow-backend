@@ -50,7 +50,7 @@ class Event < ActiveRecord::Base
   end
 
   def is_full?
-    self.assisting_people.count == self.assist_limit
+    self.assisting_people.count == self.assist_limit && self.assist_limit != 0
   end
 
 

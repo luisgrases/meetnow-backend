@@ -55,14 +55,14 @@ module Api
           me_as_member.status = 'assisting'
           me_as_member.save
         end
-        respond_with me_as_member
+        respond_with :api, me_as_member
       end
 
       def not_assist
         me_as_member = Member.where(user: current_user, event_id: params[:id]).first
         me_as_member.status = 'not_assisting'
         me_as_member.save
-        respond_with me_as_member
+        respond_with :api, me_as_member
       end
 
       private
