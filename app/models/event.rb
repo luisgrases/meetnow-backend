@@ -7,6 +7,7 @@ class Event < ActiveRecord::Base
 
   accepts_nested_attributes_for :users, :members
 
+
   def assisting_people
     result = []
     User.includes(:members).where(members: {event: self, status: 'assisting'}).each do |user|
@@ -47,4 +48,10 @@ class Event < ActiveRecord::Base
       pending: self.pending_people.count
     }
   end
+
+  def is_full?
+    self.assisting_people.count == self.assist_limit
+  end
+
+
 end
