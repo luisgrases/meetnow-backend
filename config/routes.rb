@@ -9,8 +9,11 @@ Rails.application.routes.draw  do
           get 'assisting_people'
           get 'not_assisting_people'
           get 'pending_people'
+          post 'change_member_privilege'
         end
       end
+
+      resources :members
 
       resources :friendships do
         collection do

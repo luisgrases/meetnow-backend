@@ -37,6 +37,17 @@ module Api
         respond_with event.pending_people
       end
 
+      def change_member_privilege
+        me_as_member = Member.where(user: current_user, event_id: params[:id]).first
+        user_to_change = Member.where(user_id: params[:user_id], event_id: params[:id]).first
+        if me_as_member.privilege == 'admin'
+          user_to_change.privilege == 'subadmin' ? user_to_change.privilege = nil : user_to_change.privilege = 'subadmin'
+          user_to_change.save
+        end
+
+        respond_with :api, user_to_change
+      end
+
 
       private
 
