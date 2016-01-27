@@ -48,6 +48,17 @@ module Api
         respond_with :api, user_to_change
       end
 
+      def assist
+        me_as_member = Member.where(user: current_user, event_id: params[:id]).first
+        me_as_member.status = 'assisting'
+        me_as_member.save
+      end
+
+      def not_assist
+        me_as_member = Member.where(user: current_user, event_id: params[:id]).first
+        me_as_member.status = 'not_assisting'
+        me_as_member.save
+      end
 
       private
 

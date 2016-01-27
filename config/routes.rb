@@ -10,6 +10,8 @@ Rails.application.routes.draw  do
           get 'not_assisting_people'
           get 'pending_people'
           post 'change_member_privilege'
+          post 'assist'
+          post 'not_assist'
         end
       end
 
