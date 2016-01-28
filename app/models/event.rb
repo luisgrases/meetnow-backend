@@ -41,7 +41,7 @@ class Event < ActiveRecord::Base
     result
   end
 
-  def invited_contacts_counter
+  def invited_people_counter
     members = {
       assisting: self.assisting_people.count,
       not_assisting: self.not_assisting_people.count,
@@ -51,6 +51,17 @@ class Event < ActiveRecord::Base
 
   def is_full?
     self.assisting_people.count == self.assist_limit && self.assist_limit != 0
+  end
+
+  def admin
+    User.includes(:members).where(members: {event: self, privilege: 'admin'}).first
+  end
+
+  def details
+    event = {
+      invited_people_counter: invited_people_counter,
+      admin: admin
+    }
   end
 
 

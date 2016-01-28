@@ -17,6 +17,11 @@ module Api
         respond_with :api, event
       end
 
+      def show
+        event = Event.find(params[:id])
+        respond_with event.details
+      end
+
       def invited_contacts_counter
         event = Event.find(params[:id])
         respond_with event.invited_contacts_counter
