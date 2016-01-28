@@ -7,6 +7,17 @@ class Event < ActiveRecord::Base
 
   accepts_nested_attributes_for :users, :members
 
+  def invited_people
+    result = []
+    User.includes(:members).where(members: {event: self}).each do |user|
+      user_member =  Member.where(event: self, user: user).first
+      user_json = user.as_json
+      user_json["privilege"] = user_member.privilege
+      user_json["status"] = user_member.status
+      result << user_json
+    end
+    result
+  end
 
   def assisting_people
     result = []
@@ -60,7 +71,8 @@ class Event < ActiveRecord::Base
   def details
     event = {
       invited_people_counter: invited_people_counter,
-      admin: admin
+      admin: admin,
+      invited_people: invited_people
     }
   end
 
