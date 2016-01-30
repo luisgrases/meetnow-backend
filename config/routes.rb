@@ -12,6 +12,7 @@ Rails.application.routes.draw  do
           post 'change_member_privilege'
           post 'assist'
           post 'not_assist'
+          post 'invite_contact'
         end
       end
 

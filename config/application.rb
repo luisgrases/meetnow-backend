@@ -16,7 +16,7 @@ module MeetnowServer
       allow do
         origins '*'
         resource '*', :headers => :any,
-                      :methods => [:get, :post, :delete, :put, :options, :head],
+                      :methods => [:get, :post, :delete, :put, :options, :head, :patch],
                       :expose  => ['access-token', 'expiry', 'token-type', 'uid', 'client'],
                       :max_age => 0
       end

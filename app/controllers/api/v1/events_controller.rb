@@ -7,6 +7,7 @@ module Api
         respond_with user.events
       end
 
+
       def create
         user = User.find(current_user.id)
         event = Event.create(event_params)
@@ -16,6 +17,21 @@ module Api
         end
         respond_with :api, event
       end
+
+      def update
+        #check if im admin or subadmin... for later
+        event = Event.find(params[:id])
+        respond_with event.update_attributes(event_params)
+      end
+
+      def invite_contact
+        #check if im admin or subadmin ... for later
+        event = Event.find(params[:id])
+        contact = User.find(params[:user_id])
+        event.users << contact
+        respond_with :api, event
+      end
+
 
       def show
         event = Event.find(params[:id])
