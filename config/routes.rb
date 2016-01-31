@@ -20,9 +20,7 @@ Rails.application.routes.draw  do
 
       resources :friendships do
         collection do
-          get 'accepted'
-          get 'requests_sent'
-          get 'requests_recieved'
+          get 'all'
           post 'accept'
         end
       end

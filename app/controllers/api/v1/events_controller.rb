@@ -2,7 +2,7 @@ module Api
   module V1
     class EventsController < ApplicationController
       include ApplicationHelper
-      
+
       respond_to :json
       def index
         user = User.find(current_user.id)
@@ -48,20 +48,6 @@ module Api
         respond_with event.invited_contacts_counter
       end
 
-      def assisting_people
-        event = Event.find(params[:id])
-        respond_with event.assisting_people
-      end
-
-      def not_assisting_people
-        event = Event.find(params[:id])
-        respond_with event.not_assisting_people
-      end
-
-      def pending_people
-        event = Event.find(params[:id])
-        respond_with event.pending_people
-      end
 
       def change_member_privilege
         me_as_member = Member.where(user: current_user, event_id: params[:id]).first

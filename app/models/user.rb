@@ -12,13 +12,8 @@ class User < ActiveRecord::Base
     where("uid LIKE ?", "%#{search}%") 
   end
 
-  def accepted_friends
-    result = []
-    accepted_friendships = Friendship.where(user: self, accepted: true)
-    accepted_friendships.each { |friendship| result << friendship.friend }
-    inverse_accepted_friendships = Friendship.where(friend: self, accepted: true)
-    inverse_accepted_friendships.each { |friendship| result << friendship.user}
-    return result
+  def contacts
+    self.friends.as_json + self.inverse_friends.as_json
   end
 
 
