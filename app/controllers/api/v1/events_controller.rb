@@ -1,6 +1,8 @@
 module Api
   module V1
     class EventsController < ApplicationController
+      include ApplicationHelper
+      
       respond_to :json
       def index
         user = User.find(current_user.id)
@@ -12,9 +14,12 @@ module Api
         user = User.find(current_user.id)
         event = Event.create(event_params)
         member = Member.create(user: user, event: event, privilege: 'admin', status: 'assisting')
-        params[:users].each do |invited|
-          event.users << User.find(invited["id"]);
+        if params[:users]
+          params[:users].each do |invited|
+            event.users << User.find(invited["id"]);
+          end
         end
+        broadcast("/events", {event: event})
         respond_with :api, event
       end
 
