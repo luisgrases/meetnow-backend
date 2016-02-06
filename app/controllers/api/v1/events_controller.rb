@@ -5,8 +5,16 @@ module Api
 
       respond_to :json
       def index
+        results = []
         user = User.find(current_user.id)
-        respond_with user.events
+        user.events.each do |event|
+          member = Member.where(event: event, user: user).first
+          event_json = event.as_json
+          event_json["my_privilege"] = member.privilege.as_json
+          event_json["my_status"] = member.status.as_json
+          results << event_json
+        end
+        respond_with results
       end
 
 
