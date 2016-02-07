@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
  before_save -> { skip_confirmation! }
 
   def self.search(search)
-    where("uid LIKE ?", "%#{search}%") 
+    where("uid LIKE ?", "%#{search}%").limit(11)
   end
 
   def contacts

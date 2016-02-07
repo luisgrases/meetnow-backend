@@ -7,6 +7,11 @@ class Event < ActiveRecord::Base
 
   accepts_nested_attributes_for :users, :members
 
+  validates :title, presence: true
+  validates :description, presence: true
+  validates :title, length: { maximum: 50 }
+  validates :description, length: { maximum: 1500 }
+
   def invited_people
     result = []
     User.includes(:members).where(members: {event: self}).each do |user|

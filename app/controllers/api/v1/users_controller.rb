@@ -3,15 +3,23 @@ module Api
     class UsersController < ApplicationController
       respond_to :json
       
-      def search
-        user = User.find(current_user.id)
+      def search 
+        user = current_user
         if params[:searchTerm] != ""
           results = User.search(params[:searchTerm])
         else
           results = []
         end
         all_friends = user.friends + user.inverse_friends
-        respond_with results - all_friends
+        final_results = results - all_friends
+        if final_results.include?(user)
+          final_results.delete(user);
+        end
+        respond_with final_results
+      end
+
+      def me
+        respond_with current_user;
       end
 
       private
