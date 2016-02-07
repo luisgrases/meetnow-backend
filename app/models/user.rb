@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
   has_many :friendships
   has_many :friends, through: :friendships
 
+  validates :username, presence: true
+
  before_save -> { skip_confirmation! }
 
   def self.search(search)
@@ -36,11 +38,10 @@ class User < ActiveRecord::Base
     return self
   end
 
-
 accepts_nested_attributes_for :members, :events
   # Include default devise modules.
   devise :database_authenticatable, :registerable,
           :recoverable, :rememberable, :trackable, :validatable,
-          :confirmable, :omniauthable
+          :confirmable, :authentication_keys => [:username]
   include DeviseTokenAuth::Concerns::User
 end
