@@ -4,56 +4,50 @@ module Api
       include ApplicationHelper
 
       respond_to :json
+      
       def index
-        results = []
-        user = User.find(current_user.id)
-        user.events.each do |event|
-          member = Member.where(event: event, user: user).first
-          event_json = event.as_json
-          event_json["my_privilege"] = member.privilege.as_json
-          event_json["my_status"] = member.status.as_json
-          results << event_json
-        end
-        respond_with results
+        render json: current_user.events
       end
 
-
       def create
-        user = User.find(current_user.id)
-        event = Event.create(event_params)
-        member = Member.create(user: user, event: event, privilege: 'admin', status: 'assisting')
-        if params[:users]
-          params[:users].each do |invited|
-            event.users << User.find(invited["id"]);
-          end
+        event = Event.new(event_params)
+        event.members.new(user: current_user, privilege: 'admin', status: 'assisting')
+        params[:users].each { |invited| event.users << User.find(invited["id"]) } if params[:users]     
+        if event.save
+          render json: event
+        else
+          render json: event.errors.full_messages, :status => 420
         end
-        broadcast("/events", {event: event})
-        respond_with :api, event
       end
 
       def update
-        #check if im admin or subadmin... for later
         event = Event.find(params[:id])
-        respond_with event.update_attributes(event_params)
+        if event.is_admin?(current_user)
+          if event.update_attributes(event_params)
+            render json: event
+          else
+            render json: event.errors.full_messages, :status => 420
+          end
+        else
+          render json: { error: 'You must be an admin to perform this operation' }, :status => 420
+        end 
       end
 
       def invite_contact
-        #check if im admin or subadmin ... for later
         event = Event.find(params[:id])
-        contact = User.find(params[:user_id])
-        event.users << contact
-        respond_with :api, event
+        if event.is_admin?(current_user) || event.is_subadmin?(current_user)
+          contact = User.find(params[:user_id])
+          event.users << contact
+          render json: event
+        else
+          render json: event.errors.full_messages
+        end
       end
 
 
       def show
         event = Event.find(params[:id])
-        respond_with event.details
-      end
-
-      def invited_contacts_counter
-        event = Event.find(params[:id])
-        respond_with event.invited_contacts_counter
+        render json: event, serializer: Events::ShowSerializer
       end
 
 
@@ -61,6 +55,7 @@ module Api
         me_as_member = Member.where(user: current_user, event_id: params[:id]).first
         user_to_change = Member.where(user_id: params[:user_id], event_id: params[:id]).first
         if me_as_member.privilege == 'admin'
+          #use 'do something' if 'condition is achieved' shortcut
           user_to_change.privilege == 'subadmin' ? user_to_change.privilege = nil : user_to_change.privilege = 'subadmin'
           user_to_change.save
         end
@@ -72,6 +67,7 @@ module Api
         event = Event.find(params[:id])
         if !event.is_full?
           me_as_member = Member.where(user: current_user, event_id: params[:id]).first
+          #change to update_attribute
           me_as_member.status = 'assisting'
           me_as_member.save
         end

@@ -11,74 +11,37 @@ class Event < ActiveRecord::Base
   validates :description, presence: true
   validates :title, length: { maximum: 50 }
   validates :description, length: { maximum: 1500 }
+  validate :assisting_limit, on: :update
+ 
+  def assisting_limit
+    errors.add(:assist_limit, "can not be lower than current assisting people") unless self.assist_limit >= assisting_people || self.assist_limit == 0
+  end
 
-  def invited_people
-    result = []
-    User.includes(:members).where(members: {event: self}).each do |user|
-      user_member =  Member.where(event: self, user: user).first
-      user_json = user.as_json
-      user_json["privilege"] = user_member.privilege
-      user_json["status"] = user_member.status
-      result << user_json
-    end
-    result
+
+  def is_full?
+    self.assisting_people == self.assist_limit && self.assist_limit != 0
+  end
+
+  def is_admin?(user)
+   member = Member.where(user: user, event: self).first
+   member.privilege == 'admin'
+  end
+
+  def is_subadmin?(user)
+    member = Member.where(user: user, event: self).first
+    member.privilege == 'subadmin'
   end
 
   def assisting_people
-    result = []
-    User.includes(:members).where(members: {event: self, status: 'assisting'}).each do |user|
-      member_privilege = Member.where(event: self, user: user).first.privilege
-      json = user.as_json
-      json["privilege"] = member_privilege
-      result << json
-    end
-    result
+    User.includes(:members).where(members: {event: self, status: 'assisting'}).count
   end
 
   def not_assisting_people
-    result = []
-    User.includes(:members).where(members: {event: self, status: 'not_assisting'}).each do |user|
-      member_privilege = Member.where(event: self, user: user).first.privilege
-      json = user.as_json
-      json["privilege"] = member_privilege
-      result << json
-    end
-    result
+    User.includes(:members).where(members: {event: self, status: 'not_assisting'}).count
   end
 
   def pending_people
-    result = []
-    User.includes(:members).where(members: {event: self, status: 'pending'}).each do |user|
-      member_privilege = Member.where(event: self, user: user).first.privilege
-      json = user.as_json
-      json["privilege"] = member_privilege
-      result << json
-    end
-    result
-  end
-
-  def invited_people_counter
-    members = {
-      assisting: self.assisting_people.count,
-      not_assisting: self.not_assisting_people.count,
-      pending: self.pending_people.count
-    }
-  end
-
-  def is_full?
-    self.assisting_people.count == self.assist_limit && self.assist_limit != 0
-  end
-
-  def admin
-    User.includes(:members).where(members: {event: self, privilege: 'admin'}).first
-  end
-
-  def details
-    event = {
-      invited_people_counter: invited_people_counter,
-      admin: admin,
-      invited_people: invited_people
-    }
+    User.includes(:members).where(members: {event: self, status: 'pending'}).count
   end
 
 
