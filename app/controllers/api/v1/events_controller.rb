@@ -24,6 +24,10 @@ module Api
         event = Event.find(params[:id])
         if event.is_admin?(current_user)
           if event.update_attributes(event_params)
+            if event.is_full?
+              event.status = 'full' 
+              event.save
+            end
             render json: event
           else
             render json: event.errors.full_messages, :status => 420
@@ -55,11 +59,12 @@ module Api
         me_as_member = Member.where(user: current_user, event_id: params[:id]).first
         user_to_change = Member.where(user_id: params[:user_id], event_id: params[:id]).first
         if me_as_member.privilege == 'admin'
-          #use 'do something' if 'condition is achieved' shortcut
-          user_to_change.privilege == 'subadmin' ? user_to_change.privilege = nil : user_to_change.privilege = 'subadmin'
-          user_to_change.save
+          if user_to_change.privilege != 'admin'
+            user_to_change.privilege == 'subadmin' ? user_to_change.privilege = nil : user_to_change.privilege = 'subadmin'
+            user_to_change.save
+          end
         end
-
+        
         respond_with :api, user_to_change
       end
 
@@ -67,18 +72,46 @@ module Api
         event = Event.find(params[:id])
         if !event.is_full?
           me_as_member = Member.where(user: current_user, event_id: params[:id]).first
-          #change to update_attribute
           me_as_member.status = 'assisting'
-          me_as_member.save
+          me_as_member.save 
+          if event.is_full?
+            event.status = 'full' 
+            event.save
+          end
+          render json: event
+        else
+        render json: { error: 'Event is full' }, :status => 420
         end
-        respond_with :api, me_as_member
       end
 
       def not_assist
+        event = Event.find(params[:id])
+        if event.is_full?
+          event.status = 'open'
+          event.save
+        end
         me_as_member = Member.where(user: current_user, event_id: params[:id]).first
         me_as_member.status = 'not_assisting'
         me_as_member.save
         respond_with :api, me_as_member
+      end
+
+      def cancel
+        event = Event.find(params[:id])
+        if event.is_admin?(current_user)
+          event.status = 'canceled'
+          event.save
+          render json: event
+        else
+          render json: { error: 'You must be an admin to perform this operation' }, :status => 420
+        end
+      end
+
+      def leave
+        event = Event.find(params[:id])
+        me_as_member = Member.where(user: current_user, event_id: params[:id]).first
+        me_as_member.destroy
+        render json: event
       end
 
       private

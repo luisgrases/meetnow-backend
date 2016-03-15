@@ -13,6 +13,8 @@ Rails.application.routes.draw  do
           post 'assist'
           post 'not_assist'
           post 'invite_contact'
+          post 'cancel'
+          post 'leave'
         end
       end
 
