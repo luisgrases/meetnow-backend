@@ -1,9 +1,14 @@
 class EventSerializer < ActiveModel::Serializer
-  attributes :title, :description, :updated_at, :my_privilege, :my_status, :id, :assist_limit, :status
+  attributes :title, :description, :updated_at, :id, :assist_limit, :status
 
-  def my_privilege
+  def attributes
+    data = super;
     member = Member.where(event: object, user: scope).first
-    member.privilege
+    if member
+      data[:my_privilege] = member.privilege
+      data[:my_status] = member.status
+    end
+    data
   end
 
   def my_status

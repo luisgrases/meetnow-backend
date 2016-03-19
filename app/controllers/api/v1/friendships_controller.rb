@@ -11,7 +11,7 @@ module Api
       def create
         user = User.find(current_user.id)
         friend = User.find(friendship_params[:id])
-        user.friends << friend
+        user.friends << friend unless user.friends.include?(friend)
         respond_with :api, user
       end
 
@@ -19,9 +19,13 @@ module Api
         user = User.find(current_user.id)
         friend = user.friends.find_by_id(params[:id])
         friend ||= user.inverse_friends.find_by_id(params[:id])
-        user.friends.delete(friend)
-        user.inverse_friends.delete(friend)
-        respond_with :api, user
+        if friend
+          user.friends.delete(friend)
+          user.inverse_friends.delete(friend)
+          render json: user
+        else
+          render json: { error: 'Error' }, :status => 420
+        end
       end
 
       def accept

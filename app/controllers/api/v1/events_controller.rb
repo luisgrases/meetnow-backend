@@ -109,8 +109,7 @@ module Api
 
       def leave
         event = Event.find(params[:id])
-        me_as_member = Member.where(user: current_user, event_id: params[:id]).first
-        me_as_member.destroy
+        event.users.delete(current_user)
         render json: event
       end
 
