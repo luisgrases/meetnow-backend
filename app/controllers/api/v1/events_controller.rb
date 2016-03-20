@@ -14,6 +14,12 @@ module Api
         event.members.new(user: current_user, privilege: 'admin', status: 'assisting')
         params[:users].each { |invited| event.users << User.find(invited["id"]) } if params[:users]     
         if event.save
+          event.reload
+
+          event.users.each do |member|
+            event_serialized = EventSerializer.new(event, {scope: member}).as_json
+            broadcast("/#{member.id}", {message: 'EVENT_INVITATION', data: event_serialized})
+          end
           render json: event
         else
           render json: event.errors.full_messages, :status => 420
@@ -28,6 +34,7 @@ module Api
               event.status = 'full' 
               event.save
             end
+            broadcast("/#{event.id}", {message: 'EVENT_GENERAL_INFO_UPDATED', data: event})
             render json: event
           else
             render json: event.errors.full_messages, :status => 420
@@ -101,6 +108,7 @@ module Api
         if event.is_admin?(current_user)
           event.status = 'canceled'
           event.save
+          broadcast("/#{event.id}", {message: 'EVENT_CANCELED', data: event.id})
           render json: event
         else
           render json: { error: 'You must be an admin to perform this operation' }, :status => 420

@@ -1,6 +1,7 @@
 module Api
   module V1
     class FriendshipsController < ApplicationController
+      include ApplicationHelper
       respond_to :json
       def index
         user = User.find(current_user.id)
@@ -12,6 +13,10 @@ module Api
         user = User.find(current_user.id)
         friend = User.find(friendship_params[:id])
         user.friends << friend unless user.friends.include?(friend)
+        user_json = user.as_json
+        user_json["accepted"] = false;
+        user_json["type"] = 'inverse'
+        broadcast("/#{friend.id}", {message: 'FRIEND_REQUEST_RECIEVED', data: user_json})
         respond_with :api, user
       end
 
@@ -22,6 +27,7 @@ module Api
         if friend
           user.friends.delete(friend)
           user.inverse_friends.delete(friend)
+          broadcast("/#{friend.id}", {message: 'FRIENDSHIP_REMOVED', data: user.id})
           render json: user
         else
           render json: { error: 'Error' }, :status => 420
@@ -34,6 +40,7 @@ module Api
         friendship = Friendship.where(user: friend, friend: user).first
         friendship.accepted = true
         friendship.save
+        broadcast("/#{friend.id}", {message: 'FRIEND_REQUEST_ACCEPTED', data: user.id})
         respond_with :api, friendship
       end
 
