@@ -49,6 +49,12 @@ module Api
         if event.is_admin?(current_user) || event.is_subadmin?(current_user)
           contact = User.find(params[:user_id])
           event.users << contact
+          contact_json = contact.as_json
+          contact_json["privilege"] = nil
+          contact_json["status"] = 'pending'
+          broadcast("/#{event.id}", {message: 'USER_INVITED', data: {event_id: event.id, user: contact_json}})
+          event_serialized = EventSerializer.new(event, {scope: contact}).as_json
+          broadcast("/#{contact.id}", {message: 'EVENT_INVITATION', data: event_serialized})
           render json: event
         else
           render json: event.errors.full_messages
@@ -63,15 +69,22 @@ module Api
 
 
       def change_member_privilege
-        me_as_member = Member.where(user: current_user, event_id: params[:id]).first
-        user_to_change = Member.where(user_id: params[:user_id], event_id: params[:id]).first
+        event = Event.find(params[:id])
+        user = User.find(params[:user_id])
+        me_as_member = Member.where(user: current_user, event: event).first
+        user_to_change = Member.where(user: user, event: event).first
         if me_as_member.privilege == 'admin'
           if user_to_change.privilege != 'admin'
-            user_to_change.privilege == 'subadmin' ? user_to_change.privilege = nil : user_to_change.privilege = 'subadmin'
+            if user_to_change.privilege == 'subadmin'
+              user_to_change.privilege = nil
+              broadcast("/#{event.id}", {message: 'USER_NOT_SUBADMIN', data: {event_id: event.id, user_id: user.id}})
+            else 
+              user_to_change.privilege = 'subadmin'
+              broadcast("/#{event.id}", {message: 'USER_SUBADMIN', data: {event_id: event.id, user_id: user.id}})
+            end
             user_to_change.save
           end
         end
-        
         respond_with :api, user_to_change
       end
 
@@ -85,6 +98,7 @@ module Api
             event.status = 'full' 
             event.save
           end
+          broadcast("/#{event.id}", {message: 'USER_ASSISTING', data: {event_id: event.id, user_id: current_user.id}})
           render json: event
         else
         render json: { error: 'Event is full' }, :status => 420
@@ -100,6 +114,7 @@ module Api
         me_as_member = Member.where(user: current_user, event_id: params[:id]).first
         me_as_member.status = 'not_assisting'
         me_as_member.save
+        broadcast("/#{event.id}", {message: 'USER_NOT_ASSISTING', data: {event_id: event.id, user_id: current_user.id}})
         respond_with :api, me_as_member
       end
 
@@ -118,6 +133,7 @@ module Api
       def leave
         event = Event.find(params[:id])
         event.users.delete(current_user)
+        broadcast("/#{event.id}", {message: 'USER_LEFT', data: {event_id: event.id, user_id: current_user.id}})
         render json: event
       end
 
