@@ -7,6 +7,7 @@ module Api
       
       def index
         render json: current_user.events
+        
       end
 
       def create

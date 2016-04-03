@@ -6,7 +6,7 @@ module Api
       def index
         user = User.find(current_user.id)
         all_friends = user.friends + user.inverse_friends
-        respond_with all_friends
+        render json: all_friends
       end
 
       def create
@@ -17,7 +17,7 @@ module Api
         user_json["accepted"] = false;
         user_json["type"] = 'inverse'
         broadcast("/#{friend.id}", {message: 'FRIEND_REQUEST_RECIEVED', data: user_json})
-        respond_with :api, user
+        render json: friend
       end
 
       def destroy
@@ -45,22 +45,10 @@ module Api
       end
 
       def all
-        result = []
         user = User.find(current_user.id)
-        user.contacts.each do |contact|
-          friendship = Friendship.where(user: user, friend_id: contact['id']).first
-          inverse_friendship ||= Friendship.where(user_id: contact['id'], friend: user).first
-          contact_json = contact.as_json
-          if friendship
-            contact_json["accepted"] = friendship.accepted
-            contact_json["type"] = 'normal'
-          else
-            contact_json["accepted"] = inverse_friendship.accepted
-            contact_json["type"] = 'inverse'
-          end
-          result << contact_json
-        end
-      respond_with result
+        all_friends = user.friends + user.inverse_friends
+        all_friends.sort! { |a,b| a.name.downcase <=> b.name.downcase }
+        render json: all_friends
       end
 
       def accepted
