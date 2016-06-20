@@ -11,6 +11,9 @@ module MeetnowServer
   class Application < Rails::Application
     # Use the responders controller from the responders gem
     config.app_generators.scaffold_controller :responders_controller
+    config.assets.initialize_on_precompile = false
+    config.middleware.delete Rack::Lock
+    config.middleware.use FayeRails::Middleware, mount: '/faye', :timeout => 25
 
 
     config.middleware.insert_before 0, "Rack::Cors" do
