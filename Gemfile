@@ -33,6 +33,8 @@ gem "responders"
 
 gem 'thin'
 
+gem 'faye'
+
 gem 'active_model_serializers'
 
 gem "figaro"
@@ -40,10 +42,6 @@ gem "figaro"
 gem 'pg'
 
 gem 'rails_12factor'
-
-gem "faye-websocket"
-gem "sinatra"
-gem "puma"
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
