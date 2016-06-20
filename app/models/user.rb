@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   has_many :friendships
   has_many :friends, through: :friendships
 
+  validates :username, length: { minimum: 6 }
   validates :username, presence: true
   validates :username, uniqueness: true
   validates_format_of :username, with: /\A[a-z0-9_]+\z/

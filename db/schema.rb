@@ -11,7 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160131225231) do
+ActiveRecord::Schema.define(version: 20160207200626) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "events", force: :cascade do |t|
     t.string   "title"
@@ -35,8 +38,8 @@ ActiveRecord::Schema.define(version: 20160131225231) do
     t.string  "privilege"
   end
 
-  add_index "members", ["event_id"], name: "index_members_on_event_id"
-  add_index "members", ["user_id"], name: "index_members_on_user_id"
+  add_index "members", ["event_id"], name: "index_members_on_event_id", using: :btree
+  add_index "members", ["user_id"], name: "index_members_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "provider",               default: "email", null: false
@@ -61,10 +64,12 @@ ActiveRecord::Schema.define(version: 20160131225231) do
     t.text     "tokens"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "username"
   end
 
-  add_index "users", ["email"], name: "index_users_on_email"
-  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-  add_index "users", ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
+  add_index "users", ["email"], name: "index_users_on_email", using: :btree
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  add_index "users", ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true, using: :btree
+  add_index "users", ["username"], name: "index_users_on_username", unique: true, using: :btree
 
 end
