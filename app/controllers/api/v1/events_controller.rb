@@ -20,6 +20,8 @@ module Api
           event.users.each do |member|
             event_serialized = EventSerializer.new(event, {scope: member}).as_json
             broadcast("/#{member.id}", {message: 'EVENT_INVITATION', data: event_serialized})
+            Pusher.trigger("#{member.id}", 'EVENT_INVITATION',
+              event_serialized)
           end
           render json: event
         else
